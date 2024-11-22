@@ -1,4 +1,4 @@
-import fileProcessingEvents from './eventManager.js';
+import fileProcessingEvents from '../config/eventManager.js';
 import File from '../model/Files.js';
 
 

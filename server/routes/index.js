@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import File from '../model/Files.js';
-import fileProcessingEvents from '../utils/eventManager.js';
+import fileProcessingEvents from '../config/eventManager.js';
 
 const upload = multer({ storage: multer.memoryStorage() });
 

@@ -4,44 +4,39 @@ import { Upload, File, AlertCircle } from 'lucide-react';
 import useApi from '@/hooks/useApi';
 import useGetStatus from '@/hooks/useGetStatus';
 
-interface FileInfo {
-  file: File;
-  previewUrl?: string;
-}
 
 const FileUploader = () => {
   const { status, uploadFile, error, setError, processedData } = useApi();
-  const [fileInfo, setFileInfo] = useState<FileInfo | undefined>();
+  const [file, setFile] = useState<File | undefined>();
   const { getStatusBar, getStatusColor, renderStatusText, renderStatusIcon } = useGetStatus(status);
 
   const handleFileChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       const validMimeTypes = [
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
-        'application/vnd.ms-excel', 
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel',
       ];
 
       if (!validMimeTypes.includes(selectedFile.type)) {
         setError('Invalid file type. Please upload an Excel file.');
-        setFileInfo(undefined);
+        setFile(undefined);
         return;
       }
-
+      setFile(selectedFile);
       setError(undefined);
-      setFileInfo({ file: selectedFile });
     }
   }, [setError]);
 
   const handleUpload = useCallback(async () => {
-    if (fileInfo?.file) {
+    if (file) {
       try {
-        await uploadFile(fileInfo.file);
+        await uploadFile(file);
       } catch (err) {
         console.error('Upload failed:', err);
       }
     }
-  }, [fileInfo, uploadFile]);
+  }, [file, uploadFile]);
 
   return (
     <div className="max-w-lg mx-auto p-8">
@@ -57,8 +52,8 @@ const FileUploader = () => {
               flex flex-col items-center justify-center w-full h-64
               border-2 border-dashed rounded-xl cursor-pointer
               transition-colors duration-200
-              ${status === 'waiting' 
-                ? 'border-gray-600 hover:border-gray-500' 
+              ${status === 'waiting'
+                ? 'border-gray-600 hover:border-gray-500'
                 : 'border-gray-700 cursor-not-allowed'
               }
             `}
@@ -66,10 +61,7 @@ const FileUploader = () => {
             <div className="flex flex-col items-center justify-center p-6 text-center">
               <Upload className="w-12 h-12 text-gray-400 mb-4" />
               <p className="mb-2 text-sm text-gray-400">
-                {fileInfo?.file 
-                  ? fileInfo.file.name 
-                  : 'Click to upload or drag and drop'
-                }
+                {file?.name ?? 'Click to upload or drag and drop'}
               </p>
               <p className="text-xs text-gray-500">
                 Excel files only (.xlsx, .xls)
@@ -93,12 +85,12 @@ const FileUploader = () => {
           </div>
         )}
 
-        {fileInfo && status === 'waiting' && (
+        {file && status === 'waiting' && (
           <div className="flex items-center justify-between mb-6 bg-gray-700/50 p-3 rounded-lg">
             <div className="flex items-center space-x-3">
               <File className="w-5 h-5 text-gray-400" />
               <span className="text-sm text-gray-300 truncate max-w-[200px]">
-                {fileInfo.file.name}
+                {file.name}
               </span>
             </div>
             <button
